@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 flex">
+    
+    <!-- Sidebar -->    
+    <aside class="w-64 bg-white shadow-md min-h-screen p-4">
+        <h2 class="text-xl font-bold mb-6">Dashboard</h2>
+        <nav>
+            <a href="#" class="nav-link active">Blogs</a>
+            <a href="#" class="nav-link" onclick="window.location.href='../Write Page/index.html'">Write</a>
+        </nav>
+        <h2 class="text-xl font-bold mb-6 mt-12">Settings</h2>
+        <nav>
+            <a href="#" id="editProfileBtn" class="nav-link" onclick="window.location.href='../Setting Page/index.html'">Edit Profile</a>
+            <a href="#" id="changePasswordBtn" class="nav-link" onclick="window.location.href='../Setting Page/index.html'">Change Password</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <h2>Manage Blogs</h2>
+        <input type="text" class="search-blogs" placeholder="Search Blogs">
+        
+        <div class="tabs">
+            <button class="tab active">Published Blogs</button>
+            <button class="tab">Drafts</button>
+        </div>
+
+        <div class="blog-list">
+            <div class="blog-card">
+                <img src="https://via.placeholder.com/80" class="blog-img">
+                <div class="blog-info">
+                    <h3>test blog 1</h3>
+                    <p>Published on 29 Sep, Friday</p>
+                    <div class="blog-actions">
+                        <a href="#" class="edit">Edit</a>
+                        <a href="#" class="delete">Delete</a>
+                    </div>
+                </div>
+                <div class="blog-stats">
+                    <div>0 Likes</div>
+                    <div>0 Comments</div>
+                    <div>0 Reads</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

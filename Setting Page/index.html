@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 flex">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md min-h-screen p-4">
+        <h2 class="text-xl font-bold mb-6">Dashboard</h2>
+        <nav>
+            <a href="#" class="nav-link" onclick="window.location.href='../Dashboard Page/index.html'">Blogs</a>
+            <a href="#" class="nav-link" onclick="window.location.href='../Write Page/index.html'">Write</a>
+        </nav>
+        <h2 class="text-xl font-bold mb-6 mt-12">Settings</h2>
+        <nav>
+            <a href="#" id="editProfileBtn" class="nav-link">Edit Profile</a>
+            <a href="#" id="changePasswordBtn" class="nav-link">Change Password</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div id="editProfile" class="settings-section">
+                <h3 class="text-xl font-semibold">Edit Profile</h3>
+                <section class="avatar">
+                    <!-- Avatar Upload -->
+                    <div class="user-photo">
+                        <label for="upload-photo" id="photo-label">
+                            <img id="preview-photo"/>
+                        </label>
+                        <input type="file" id="upload-photo" accept="image/*" />
+                    </div>
+                </section>
+
+                <!-- User Info -->
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-gray-600">Username</label>
+                        <input type="text" value="kunaal" class="input-field" readonly>
+                    </div>
+                    <div>
+                        <label class="text-gray-600">Email</label>
+                        <input type="email" value="kunaal@gmail.com" class="input-field" readonly>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-gray-600">Bio</label>
+                        <textarea class="input-field h-24" placeholder="Write about yourself..."></textarea>
+                        <p class="text-gray-500 text-sm mt-1">200 characters left</p>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <h3 class="text-lg font-semibold mt-6 mb-2">Add Your Social Handles Below</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="YouTube" class="input-field">
+                    <input type="text" placeholder="Instagram" class="input-field">
+                    <input type="text" placeholder="Facebook" class="input-field">
+                    <input type="text" placeholder="Twitter" class="input-field">
+                    <input type="text" placeholder="LinkedIn" class="input-field">
+                    <input type="text" placeholder="Website" class="input-field">
+                </div>
+
+                <!-- Update Button -->
+                <button class="btn-update mt-4 rounded-full">Update</button>
+            </div>
+            
+            <div id="changePassword" class="settings-section hidden">
+                <h3 class="text-xl font-semibold">Change Password</h3>
+                <label class="block mt-4">Current Password</label>
+                <input type="password" id="currentPassword" class="input-field">
+                <label class="block mt-4">New Password</label>
+                <input type="password" id="newPassword" class="input-field">
+                <label class="block mt-4">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="input-field">
+                <button class="btn-update mt-4 rounded-full">Change Password</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
