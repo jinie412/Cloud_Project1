@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   const authButtons = document.getElementById("authButtons");
   const postContainer = document.getElementById("postContainer");
   const topicList = document.getElementById("topicList");
+  const searchInput = document.getElementById("searchInput");
+
+  let allPosts = [];
 
   // Hiển thị avatar nếu có user đăng nhập
   if (userId) {
@@ -23,43 +26,67 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Hàm load bài viết (tất cả hoặc của 1 user)
+  // Hàm hiển thị danh sách bài viết
+  function renderPosts(posts) {
+    postContainer.innerHTML = "";
+    posts.forEach((post) => {
+      const createdDate = new Date(post.created_at).toLocaleDateString();
+      const updatedDate = new Date(post.updated_at).toLocaleDateString();
+      const isUpdated = createdDate !== updatedDate;
+
+      const postHTML = `
+        <a href="../blog/blog.html?id=${
+          post.id
+        }" class="block hover:opacity-80 transition">
+          <div class="w-full flex gap-8 items-start border-b border-gray-300">
+            <div class="w-full bg-white p-6 rounded-lg flex items-start gap-4">
+              <div class="flex-grow">
+                <div class="flex items-center gap-3 mb-2">
+                  <img src="${post.avatar_url || "../img/default-avatar.png"}" 
+                       class="w-5 h-5 rounded-full object-cover border" />
+                  <span class="text-sm text-gray-600">@${
+                    post.username || "Ẩn danh"
+                  }</span>
+                  <p class="text-sm text-gray-600">
+                   ${createdDate}
+                  ${isUpdated ? `<br>Cập nhật: ${updatedDate}` : ""}
+                </p>
+                </div>
+                <h1 class="text-2xl font-semibold">${post.title}</h1>
+                <p class="my-3 text-xl text-gray-600">${post.des}</p>
+                <span class="bg-gray-200 px-3 py-1 rounded-full text-sm">
+                  ${post.topic || "Uncategorized"}
+                </span>
+                
+              </div>
+              <div class="w-1/3 md:w-1/4 h-auto rounded-lg object-cover">
+                <img src="${post.image_url || "../img/logo.png"}" />
+              </div>
+            </div>
+          </div>
+        </a>
+      `;
+      postContainer.innerHTML += postHTML;
+    });
+  }
+
+  // Hàm load bài viết từ API
   async function loadPosts(url) {
     try {
       const res = await fetch(url);
       const posts = await res.json();
-
-      postContainer.innerHTML = "";
-      posts.forEach((post) => {
-        const postHTML = `
-            <div class="w-full flex gap-8 items-start border-b border-gray-300">
-              <div class="w-full bg-white p-6 rounded-lg flex items-start gap-4">
-                <div class="flex-grow">
-                  <h1 class="text-2xl font-semibold">${post.title}</h1>
-                  <p class="my-3 text-xl text-gray-600">${post.des}</p>
-                  <span class="bg-gray-200 px-3 py-1 rounded-full text-sm">
-                    ${post.topic || "Uncategorized"}
-                  </span>
-                </div>
-                <div class="w-1/3 md:w-1/4 h-auto rounded-lg object-cover">
-                  <img src="${post.image_url || "../img/logo.png"}" />
-                </div>
-              </div>
-            </div>
-          `;
-        postContainer.innerHTML += postHTML;
-      });
+      allPosts = posts;
+      renderPosts(posts);
     } catch (err) {
-      console.error(" Lỗi khi load bài viết:", err);
+      console.error("Lỗi khi load bài viết:", err);
     }
   }
 
-  // Hàm load topics
+  // Hàm load danh sách chủ đề
   async function loadTopics(url, postUrlAll) {
     try {
       const res = await fetch(url);
       const topics = await res.json();
-
       topicList.innerHTML = "";
 
       // Nút ALL
@@ -67,7 +94,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       allBtn.innerText = "All";
       allBtn.className =
         "bg-black text-white px-3 py-1 rounded-full text-sm hover:bg-opacity-80";
-      allBtn.onclick = () => loadPosts(postUrlAll);
+      allBtn.onclick = () => {
+        loadPosts(postUrlAll);
+        searchInput.value = "";
+      };
       topicList.appendChild(allBtn);
 
       topics.forEach((topic) => {
@@ -75,8 +105,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         btn.innerText = topic.topic;
         btn.className =
           "bg-gray-200 px-3 py-1 rounded-full text-sm hover:bg-gray-400";
-        btn.onclick = () =>
-          loadPosts(`http://localhost:3000/api/posts/topic/${topic.id}`);
+        btn.onclick = () => {
+          const url = `http://localhost:3000/api/posts/topic/${topic.id}`;
+
+          loadPosts(url);
+          searchInput.value = "";
+        };
         topicList.appendChild(btn);
       });
     } catch (err) {
@@ -84,21 +118,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Load bài của user khi đăng nhập
-  if (userId) {
-    loadPosts(`http://localhost:3000/api/posts/user/${userId}`);
-    loadTopics(
-      `http://localhost:3000/api/topics/user/${userId}`,
-      `http://localhost:3000/api/posts/user/${userId}`
-    );
-  } else {
-    loadPosts(`http://localhost:3000/api/posts`);
-    loadTopics(
-      `http://localhost:3000/api/topics`,
-      `http://localhost:3000/api/posts`
-    );
-  }
-  // Hiện dropdown
+  // Xác định URL phù hợp để load dữ liệu ban đầu
+  const postUrl = "http://localhost:3000/api/posts";
+  const topicUrl = "http://localhost:3000/api/topics";
+
+  // Load dữ liệu ban đầu
+  loadPosts(postUrl);
+  loadTopics(topicUrl, postUrl);
+
+  // Dropdown avatar
   avatarImg.addEventListener("click", function () {
     const dropdown = document.getElementById("avatarDropdown");
     dropdown.classList.toggle("hidden");
@@ -118,5 +146,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     localStorage.removeItem("userId");
     alert("Đã đăng xuất!");
     window.location.href = "../login/login.html";
+  });
+
+  // Tìm kiếm bài viết
+  searchInput.addEventListener("input", function (e) {
+    const keyword = e.target.value.trim().toLowerCase();
+    const filteredPosts = allPosts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(keyword) ||
+        post.des?.toLowerCase().includes(keyword) ||
+        post.content?.toLowerCase().includes(keyword)
+    );
+    renderPosts(filteredPosts);
   });
 });

@@ -17,9 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
+    const email = document.getElementById("email").value.trim();
 
-    if (!username || !password) {
-      alert("Vui lòng nhập đầy đủ Username và Password");
+    if (!username || !password || !email) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+    if (!email.includes("@")) {
+      alert("Email không hợp lệ!");
       return;
     }
 
@@ -29,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, email }),
       });
 
       const result = await response.json();
