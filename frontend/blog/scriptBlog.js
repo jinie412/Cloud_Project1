@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     .addEventListener("click", () => {
       localStorage.removeItem("userId");
       alert("Đã đăng xuất!");
-      window.location.href = "../login/login.html";
+      window.location.href = "../login/index.html";
     });
 
   // Load bài viết

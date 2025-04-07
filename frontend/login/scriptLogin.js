@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         alert("Đăng nhập thành công!");
         localStorage.setItem("userId", result.userId);
-        window.location.href = "../home/home.html";
+        window.location.href = "../home/index.html";
       } else {
         alert(result.error || "Sai tài khoản hoặc mật khẩu");
       }

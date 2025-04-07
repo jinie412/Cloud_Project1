@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const isUpdated = createdDate !== updatedDate;
 
       const postHTML = `
-        <a href="../blog/blog.html?id=${
+        <a href="../blog/index.html?id=${
           post.id
         }" class="block hover:opacity-80 transition">
           <div class="w-full flex gap-8 items-start border-b border-gray-300">
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   signOutDiv.addEventListener("click", () => {
     localStorage.removeItem("userId");
     alert("Đã đăng xuất!");
-    window.location.href = "../login/login.html";
+    window.location.href = "../login/index.html";
   });
 
   // Tìm kiếm bài viết

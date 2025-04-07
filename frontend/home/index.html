@@ -12,14 +12,14 @@
       href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
     />
     <link href="../style/output.css" rel="stylesheet" />
-    <title>Blog</title>
+    <title>Home</title>
   </head>
   <body class="flex flex-col min-h-screen">
     <!-- Navbar -->
     <nav
       class="z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] py-5 h-[80px] border-b border-grey bg-white"
     >
-      <a href="../home/home.html">
+      <a href="../home/index.html">
         <img src="../img/logo.png" class="flex-none w-16 cursor-pointer" />
       </a>
 
@@ -28,6 +28,7 @@
         class="absolute bg-white w-full left-0 top-full mt-0.5 border-b border-gray-50 py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto"
       >
         <input
+          id="searchInput"
           type="text"
           placeholder="Search"
           class="w-full md:w-auto bg-gray-100 p-4 pl-6 pr-[12%] md:pr-6 rounded-full placeholder:text-gray-500 md:pl-12"
@@ -52,7 +53,7 @@
         <!-- Group nút đăng nhập / đăng ký -->
         <div id="authButtons" class="flex gap-2 items-center">
           <a
-            href="../login/login.html"
+            href="../login/index.html"
             class="whitespace-nowrap bg-black text-white rounded-full py-3 px-6 text-xl capitalize hover:bg-opacity-80"
           >
             <p>Sign In</p>
@@ -87,11 +88,25 @@
       </div>
     </nav>
 
-    <!-- Nội dung bài viết -->
-    <div class="w-full center py-10 max-lg:px-[5vw]" id="blogContainer">
-      <!-- được render bằng JS -->
-    </div>
+    <section
+      class="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row mt-6"
+    >
+      <!-- Left: Blog Posts -->
+      <div id="postContainer" class="w-full h-full my-4 mr-3 md:w-2/3 -r-2">
+        <!-- Các bài viết sẽ được render bằng JS tại đây -->
+      </div>
 
-    <script src="scriptBlog.js"></script>
+      <!-- Right: Topics -->
+      <div class="w-full h-full my-4 md:w-1/3">
+        <div class="px-4 py-6 bg-white rounded-lg">
+          <h2 class="text-xl font-semibold mb-4">Stories from all interests</h2>
+          <div id="topicList" class="flex flex-wrap gap-3">
+            <!-- Các topic sẽ được render ở đây -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="scriptHome.js"></script>
   </body>
 </html>
