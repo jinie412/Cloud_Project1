@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const bannerUpload = document.getElementById("bannerUpload");
-    const bannerInput = document.getElementById("bannerInput");
+    const bannerInput = document.getElementById("bannerInput"); // Input trên trang Write
     const blogTitleInput = document.getElementById("blogTitle");
     const blogContentInput = document.getElementById("blogContent");
     const publishBtnWritePage = document.getElementById("publish");
@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const topicInputPreview = document.getElementById("blogTopic");
     const topicContainerPreview = document.createElement("div");
     topicContainerPreview.classList.add("mt-2");
+    const bannerInputPreview = document.getElementById("bannerInputPreview"); // Input ẩn trên trang Preview
 
     // Lưu trạng thái ban đầu của trang Write khi tải
     const initialWriteState = {
@@ -22,45 +23,51 @@ document.addEventListener("DOMContentLoaded", () => {
         bannerText: bannerUpload ? bannerUpload.textContent : ""
     };
 
-    // Handle banner upload on Write Page
+    let selectedBannerFile = null; // Biến để lưu tệp banner
+
+    // Handle banner upload on Write Page (chỉ hiển thị preview và lưu tệp vào biến)
     if (bannerUpload && bannerInput) {
         bannerUpload.addEventListener("click", () => bannerInput.click());
         bannerInput.addEventListener("change", (event) => {
             const file = event.target.files[0];
             if (file) {
+                selectedBannerFile = file; // Lưu tệp vào biến
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     bannerUpload.style.backgroundImage = `url(${e.target.result})`;
                     bannerUpload.style.backgroundSize = "cover";
                     bannerUpload.style.backgroundPosition = "center";
                     bannerUpload.textContent = "";
-                    localStorage.setItem("blogImage", e.target.result);
+                    localStorage.setItem("blogImageForPreview", e.target.result); // Vẫn giữ để hiển thị preview
                 };
                 reader.readAsDataURL(file);
+            } else {
+                selectedBannerFile = null; // Xóa biến nếu không có tệp nào được chọn
+                bannerUpload.style.backgroundImage = "";
+                bannerUpload.style.backgroundColor = "#e5e7eb";
+                bannerUpload.textContent = "Upload Banner";
+                localStorage.removeItem("blogImageForPreview");
             }
         });
     }
 
-    // Publish on Write Page
+    // Publish on Write Page (lưu Data URL cho Preview)
     if (publishBtnWritePage) {
         publishBtnWritePage.addEventListener("click", function () {
             let title = blogTitleInput.value.trim();
             let content = blogContentInput.value.trim();
-
+            const storedImage = localStorage.getItem("blogImageForPreview");
+            localStorage.setItem("currentBannerPreview", storedImage || "../assets/images/default.jpg");
             localStorage.setItem("blogTitle", title || "Untitled Blog");
             localStorage.setItem("blogContent", content);
-
-            const storedImage = localStorage.getItem("blogImage");
-            localStorage.setItem("currentBanner", storedImage || "../assets/images/default.jpg");
-
             window.location.href = "preview.html";
         });
     }
 
-    // Xử lý dữ liệu trên Preview Page
+    // Xử lý dữ liệu trên Preview Page (hiển thị preview từ localStorage)
     if (previewTitleDisplay && previewImage) {
         previewTitleDisplay.innerText = localStorage.getItem("blogTitle") || "Untitled Blog";
-        previewImage.src = localStorage.getItem("currentBanner") || "../assets/images/default.jpg";
+        previewImage.src = localStorage.getItem("currentBannerPreview") || "../assets/images/default.jpg";
     }
 
     // Theo dõi số lượng ký tự trong Description
@@ -72,35 +79,25 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Xử lý nút đóng Preview Page
+    // Xử lý nút đóng Preview Page (khôi phục preview)
     if (closePreviewBtn) {
         closePreviewBtn.addEventListener("click", function () {
-            // Lấy dữ liệu đã lưu từ localStorage
             const storedTitle = localStorage.getItem("blogTitle");
             const storedContent = localStorage.getItem("blogContent");
-            const storedBanner = localStorage.getItem("currentBanner");
+            const storedBannerPreview = localStorage.getItem("currentBannerPreview");
 
-            // Khôi phục dữ liệu vào các trường trên trang Write
-            if (blogTitleInput) {
-                blogTitleInput.value = storedTitle || initialWriteState.title;
-            }
-            if (blogContentInput) {
-                blogContentInput.value = storedContent || initialWriteState.content;
-            }
-            if (bannerUpload && storedBanner && storedBanner !== "../assets/images/default.jpg") {
-                bannerUpload.style.backgroundImage = `url(${storedBanner})`;
+            if (blogTitleInput) blogTitleInput.value = storedTitle || initialWriteState.title;
+            if (blogContentInput) blogContentInput.value = storedContent || initialWriteState.content;
+            if (bannerUpload && storedBannerPreview && storedBannerPreview !== "../assets/images/default.jpg") {
+                bannerUpload.style.backgroundImage = `url(${storedBannerPreview})`;
                 bannerUpload.style.backgroundSize = "cover";
                 bannerUpload.style.backgroundPosition = "center";
                 bannerUpload.textContent = "";
             } else if (bannerUpload) {
                 bannerUpload.style.backgroundImage = initialWriteState.banner;
                 bannerUpload.textContent = initialWriteState.bannerText;
-                if (!initialWriteState.banner) {
-                    bannerUpload.style.backgroundColor = "#e5e7eb"; // Màu nền gray-200
-                }
+                if (!initialWriteState.banner) bannerUpload.style.backgroundColor = "#e5e7eb";
             }
-
-            // Chuyển hướng về trang Write
             window.location.href = "write.html";
         });
     }
@@ -110,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
         publishBtnPreviewPage.addEventListener("click", async function () {
             const title = localStorage.getItem("blogTitle");
             const content = localStorage.getItem("blogContent");
-            const imageUrl = localStorage.getItem("currentBanner");
             const description = document.getElementById("blogDescription").value.trim();
             const userId = localStorage.getItem("userId");
             const currentTopic = topicInputPreview.value.trim();
@@ -121,33 +117,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            function dataURLtoFile(dataurl, filename) {
+                let arr = dataurl.split(',');
+                let mime = arr[0].match(/:(.*?);/)[1];
+                let bstr = atob(arr[1]);
+                let n = bstr.length;
+                let u8arr = new Uint8Array(n);
+                while(n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, {type:mime});
+            }            
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('content', content);
+            formData.append('des', description || '');
+            formData.append('user_id', userId);
+            formData.append('topic_id', topicId || null);
+
+            // LẤY TỆP BANNER TRỰC TIẾP TỪ BIẾN selectedBannerFile
+            const storedBase64 = localStorage.getItem("currentBannerPreview");
+            if (storedBase64 && storedBase64.startsWith("data:image")) {
+                const fileFromBase64 = dataURLtoFile(storedBase64, "banner.jpg");
+                formData.append('banner', fileFromBase64);
+            }
+
             try {
                 const response = await fetch("http://localhost:3000/api/posts", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        // Bạn có thể cần thêm Authorization header nếu API yêu cầu
-                    },
-                    body: JSON.stringify({
-                        title: title,
-                        content: content,
-                        image_url: imageUrl === "../assets/images/default.jpg" ? null : imageUrl,
-                        des: description || null,
-                        user_id: parseInt(userId),
-                        topic_id: topicId,
-                    }),
+                    body: formData,
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
                     alert("Published!");
-                    // Chuyển hướng người dùng về trang Write và đặt lại trạng thái
                     window.location.href = "write.html";
                     localStorage.removeItem("blogTitle");
                     localStorage.removeItem("blogContent");
-                    localStorage.removeItem("currentBanner");
-                    localStorage.removeItem("blogTopics");
+                    localStorage.removeItem("currentBannerPreview");
+                    selectedBannerFile = null; // Reset biến sau khi publish
                 } else {
                     alert(`Publishing failure: ${result.message || response.statusText}`);
                 }
@@ -192,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Khôi phục trạng thái trang Write khi tải lại (ví dụ sau khi đóng Preview)
     const storedTitleOnLoad = localStorage.getItem("blogTitle");
     const storedContentOnLoad = localStorage.getItem("blogContent");
-    const storedBannerOnLoad = localStorage.getItem("currentBanner");
+    const storedBannerOnLoad = localStorage.getItem("currentBannerPreview");
 
     if (blogTitleInput && storedTitleOnLoad) {
         blogTitleInput.value = storedTitleOnLoad;

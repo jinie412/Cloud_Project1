@@ -74,8 +74,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.innerHTML = `
   <div class="max-w-3xl mx-auto">
       <img src="${
-          post.image_url
-      }" class="w-full rounded-xl max-h-[500px] object-cover mb-8 mx-auto" />
+            post.image_url && post.image_url.startsWith('http') ? post.image_url :
+            post.image_url && post.image_url.startsWith('/') ? `http://localhost:3000${post.image_url}` :
+            "../img/logo.png"
+      }" alt="Banner" class="w-full rounded-xl max-h-[500px] object-cover mb-8 mx-auto" />
 
       <h1 class="text-4xl font-bold mb-6 text-center">${post.title}</h1>
 

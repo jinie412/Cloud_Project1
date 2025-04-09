@@ -199,3 +199,58 @@ document.addEventListener("DOMContentLoaded", async function () {
 //         editProfileSection.classList.add("hidden");
 //     });
 // });
+
+// Xử lý đổi mật khẩu
+const currentPasswordInput = document.getElementById("currentPassword");
+const newPasswordInput = document.getElementById("newPassword");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+
+// Chỉ thêm event nếu đang ở trang đổi mật khẩu
+if (currentPasswordInput && newPasswordInput && confirmPasswordInput) {
+  const changePasswordBtn = document.querySelector(".btn-update");
+
+  changePasswordBtn?.addEventListener("click", async () => {
+    const userId = localStorage.getItem("userId");
+    const currentPassword = currentPasswordInput.value.trim();
+    const newPassword = newPasswordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return alert("Vui lòng điền đầy đủ thông tin.");
+    }
+
+    if (newPassword !== confirmPassword) {
+      return alert("Mật khẩu mới và xác nhận không khớp.");
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/users/${userId}/change-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Đổi mật khẩu thành công!");
+        currentPasswordInput.value = "";
+        newPasswordInput.value = "";
+        confirmPasswordInput.value = "";
+      } else {
+        alert(result.message || "Có lỗi xảy ra.");
+      }
+    } catch (err) {
+      console.error("Lỗi kết nối đổi mật khẩu:", err);
+      alert("Không thể kết nối đến server.");
+    }
+  });
+}

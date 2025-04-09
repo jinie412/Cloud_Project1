@@ -48,8 +48,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             <div class="w-full bg-white p-6 rounded-lg flex items-start gap-4">
               <div class="flex-grow">
                 <div class="flex items-center gap-3 mb-2">
-                  <img src="${post.avatar_url || "../img/default-avatar.png"}" 
-                       class="w-5 h-5 rounded-full object-cover border" />
+                  <img src="${
+                      post.avatar_url && post.avatar_url.startsWith('http') ? post.avatar_url :
+                      post.avatar_url && post.avatar_url.startsWith('/') ? `http://localhost:3000${post.avatar_url}` :
+                      "../img/logo.png"
+                  }" alt="Avatar" class="w-5 h-5 rounded-full object-cover border" />
                   <span class="text-sm text-gray-600">@${
                     post.username || "Ẩn danh"
                   }</span>
@@ -66,7 +69,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 
               </div>
               <div class="w-1/3 md:w-1/4 h-auto rounded-lg object-cover">
-                <img src="${post.image_url || "../img/logo.png"}" />
+                <img src="${
+                      post.image_url && post.image_url.startsWith('http') ? post.image_url :
+                      post.image_url && post.image_url.startsWith('/') ? `http://localhost:3000${post.image_url}` :
+                      "../img/logo.png"
+                }" alt="Banner" class="w-full rounded-xl max-h-[500px] object-cover mb-8 mx-auto" />
               </div>
             </div>
           </div>

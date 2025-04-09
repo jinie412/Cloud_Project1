@@ -69,4 +69,42 @@ router.put("/users/:id", upload.single('avatar'), async (req, res) => {
     }
 });
 
+// Phần chỉnh sửa mật khẩu
+router.put("/users/:id/change-password", async (req, res) => {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+        // 1. Lấy mật khẩu hiện tại từ DB
+        const [rows] = await pool.query(
+        "SELECT password_hash FROM users WHERE id = ?",
+        [id]
+        );
+
+        if (rows.length === 0) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng." });
+        }
+
+        const user = rows[0];
+        console.log("Client gửi mật khẩu:", currentPassword);
+        console.log("Mật khẩu trong DB:", user.password_hash);
+
+        // 2. So sánh mật khẩu plain text
+        if (user.password_hash !== currentPassword) {
+        return res.status(400).json({ message: "Mật khẩu hiện tại không đúng." });
+        }
+
+        // 3. Cập nhật mật khẩu mới
+        await pool.query("UPDATE users SET password_hash = ? WHERE id = ?", [
+        newPassword,
+        id,
+        ]);
+
+        return res.json({ message: "Đổi mật khẩu thành công." });
+    } catch (err) {
+        console.error("Lỗi khi đổi mật khẩu:", err);
+        res.status(500).json({ message: "Lỗi server." });
+    }
+});
+
 module.exports = router;
