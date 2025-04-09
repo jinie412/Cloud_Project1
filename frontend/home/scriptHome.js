@@ -16,12 +16,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       if (response.ok) {
         authButtons.classList.add("hidden");
-        if (result.avatar_url && result.avatar_url.startsWith('http')) {
-            avatarImg.src = result.avatar_url; // Nếu là URL đầy đủ, sử dụng trực tiếp
-        } else if (result.avatar_url && result.avatar_url.startsWith('/')) {
-            avatarImg.src = `http://localhost:3000${result.avatar_url}`; // Nếu là đường dẫn tương đối, thêm tiền tố backend
+        if (result.avatar_url && result.avatar_url.startsWith("http")) {
+          avatarImg.src = result.avatar_url; // Nếu là URL đầy đủ, sử dụng trực tiếp
+        } else if (result.avatar_url && result.avatar_url.startsWith("/")) {
+          avatarImg.src = `http://localhost:3000${result.avatar_url}`; // Nếu là đường dẫn tương đối, thêm tiền tố backend
         } else {
-            avatarImg.src = "../img/logo.png"; // Sử dụng ảnh mặc định nếu không có URL hoặc định dạng không xác định
+          avatarImg.src = "../img/logo.png"; // Sử dụng ảnh mặc định nếu không có URL hoặc định dạng không xác định
         }
         avatarImg.classList.remove("hidden");
       } else {
@@ -36,9 +36,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   function renderPosts(posts) {
     postContainer.innerHTML = "";
     posts.forEach((post) => {
-      const createdDate = new Date(post.created_at).toLocaleDateString();
-      const updatedDate = new Date(post.updated_at).toLocaleDateString();
-      const isUpdated = createdDate !== updatedDate;
+      const createdDate = new Date(post.created_at);
+      const updatedDate = new Date(post.updated_at);
+
+      let displayDate = "Invalid date";
+      if (post.updated_at && post.updated_at !== post.created_at) {
+        displayDate = `Update: ${updatedDate.toLocaleDateString()}`;
+      } else if (post.created_at) {
+        displayDate = createdDate.toLocaleDateString();
+      }
 
       const postHTML = `
         <a href="../blog/blog.html?id=${
@@ -53,17 +59,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                   <span class="text-sm text-gray-600">@${
                     post.username || "Ẩn danh"
                   }</span>
-                  <p class="text-sm text-gray-600">
-                   ${createdDate}
-                  ${isUpdated ? `<br>Cập nhật: ${updatedDate}` : ""}
-                </p>
+                  <p class="text-sm text-gray-600">${displayDate}</p>
                 </div>
                 <h1 class="text-2xl font-semibold">${post.title}</h1>
                 <p class="my-3 text-xl text-gray-600">${post.des}</p>
                 <span class="bg-gray-200 px-3 py-1 rounded-full text-sm">
                   ${post.topic || "Uncategorized"}
                 </span>
-                
               </div>
               <div class="w-1/3 md:w-1/4 h-auto rounded-lg object-cover">
                 <img src="${post.image_url || "../img/logo.png"}" />
@@ -181,11 +183,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   // Chuyển đến Write Page
-  const writeLink = document.querySelector('a.hidden.md\\:flex.gap-2');
+  const writeLink = document.querySelector("a.hidden.md\\:flex.gap-2");
 
   if (writeLink) {
     writeLink.addEventListener("click", (event) => {
-      event.preventDefault();  
+      event.preventDefault();
       window.location.href = "../write/write.html";
     });
   } else {

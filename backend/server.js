@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Phục vụ thư mục 'uploads' tại đường dẫn '/uploads'
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -33,7 +33,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api", postRoutes);
 app.use("/api", userRoutes);
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
