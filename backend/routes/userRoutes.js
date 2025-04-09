@@ -1,0 +1,72 @@
+const express = require("express");
+const router = express.Router();
+const pool = require("../db");
+const multer = require("multer");
+const path = require("path");
+
+// Cấu hình multer để lưu trữ tệp (bạn có thể tùy chỉnh thư mục và tên tệp)
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../uploads/avatars')); // Lưu vào thư mục uploads/avatars
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Route lấy thông tin user
+router.get("/users/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [users] = await pool.query(
+            "SELECT id, username, email, bio, avatar_url FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ error: "User không tồn tại" });
+        }
+
+        res.json(users[0]);
+    } catch (error) {
+        console.error("Lỗi lấy thông tin user:", error);
+        res.status(500).json({ error: "Lỗi server" });
+    }
+});
+
+// Route chỉnh sửa thông tin user (cập nhật bio và avatar URL)
+router.put("/users/:id", upload.single('avatar'), async (req, res) => {
+    const { id } = req.params;
+    const { bio } = req.body;
+    const avatarUrl = req.file ? `/uploads/avatars/${req.file.filename}` : null; // Lấy URL của ảnh đã tải lên
+
+    try {
+        let query = "UPDATE users SET bio = ?";
+        let params = [bio];
+
+        if (avatarUrl) {
+            query += ", avatar_url = ?";
+            params.push(avatarUrl);
+        }
+
+        query += " WHERE id = ?";
+        params.push(id);
+
+        const [result] = await pool.query(query, params);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: "Thông tin người dùng đã được cập nhật thành công!", avatar_url: avatarUrl });
+        } else {
+            res.status(404).json({ error: "Không tìm thấy người dùng để cập nhật." });
+        }
+    } catch (error) {
+        console.error("Lỗi cập nhật thông tin user:", error);
+        res.status(500).json({ error: "Lỗi server khi cập nhật thông tin." });
+    }
+});
+
+module.exports = router;
